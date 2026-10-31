@@ -2,8 +2,12 @@
 import "./load-env.js";
 import express from "express";
 import cors from "cors";
+
 import { supabase } from "./config/supabase.js";
 import { authClient } from "./config/auth.js";
+
+import billingRoutes from "./routes/billingRoutes.js";
+import invoiceRoutes from "./routes/invoiceRoutes.js";
 
 const app = express();
 
@@ -18,13 +22,15 @@ app.use(
 
 app.use(express.json());
 
-// BASIC ROUTES
+// ROOT ROUTE
 
 app.get("/", (req, res) => {
   res.json({
     message: "Brightloop Backend is Running!",
   });
 });
+
+// HEALTH CHECK
 
 app.get("/api/health", (req, res) => {
   res.json({
@@ -36,23 +42,25 @@ app.get("/api/health", (req, res) => {
 // DATABASE CONNECTION CHECK
 
 app.get("/api/db-check", async (req, res) => {
-  const { data, error } = await supabase
-    .from("products")
-    .select("id")
-    .limit(1);
+  try {
+    const { data, error } = await supabase
+      .from("products")
+      .select("id")
+      .limit(1);
 
-  if (error) {
-    return res.status(500).json({
+    if (error) throw error;
+
+    res.json({
+      status: "success",
+      message: "Supabase connected successfully!",
+      data,
+    });
+  } catch (error) {
+    res.status(500).json({
       status: "error",
       message: error.message,
     });
   }
-
-  res.json({
-    status: "success",
-    message: "Supabase connected successfully!",
-    data,
-  });
 });
 
 // SIGN UP
@@ -126,11 +134,10 @@ app.post("/api/auth/login", async (req, res) => {
       });
     }
 
-    const { data, error } =
-      await authClient.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
+    const { data, error } = await authClient.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
 
     if (error) {
       return res.status(401).json({
@@ -153,7 +160,7 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
-// AUTHENTICATED USER
+// VERIFY AUTHENTICATED USER
 
 app.get("/api/auth/me", async (req, res) => {
   try {
@@ -168,8 +175,7 @@ app.get("/api/auth/me", async (req, res) => {
 
     const token = authHeader.split(" ")[1];
 
-    const { data, error } =
-      await authClient.auth.getUser(token);
+    const { data, error } = await authClient.auth.getUser(token);
 
     if (error || !data.user) {
       return res.status(401).json({
@@ -189,6 +195,14 @@ app.get("/api/auth/me", async (req, res) => {
     });
   }
 });
+
+// BILLING ROUTES
+
+app.use("/api/billing", billingRoutes);
+
+// INVOICE ROUTES
+
+app.use("/api/invoices", invoiceRoutes);
 
 // START SERVER
 
