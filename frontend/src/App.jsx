@@ -1,5 +1,6 @@
-
+import Auth from "./Auth.jsx";
 import { useState } from "react";
+
 import {
   LayoutDashboard,
   Users,
@@ -17,6 +18,12 @@ import {
   CalendarDays,
   Menu,
   X,
+  Receipt,
+  Wallet,
+  Percent,
+  ShieldCheck,
+  Layers,
+  ClipboardList,
 } from "lucide-react";
 
 import {
@@ -31,6 +38,7 @@ import {
 
 import "./App.css";
 
+// SAMPLE REVENUE DATA
 const revenueData = [
   { month: "Jan", revenue: 12000 },
   { month: "Feb", revenue: 15000 },
@@ -46,27 +54,81 @@ const revenueData = [
   { month: "Dec", revenue: 39000 },
 ];
 
+// SAMPLE SUBSCRIPTION DATA
 const subscriptions = [
-  { name: "Olivia Martin", email: "olivia@example.com", plan: "Premium", amount: "₹2,499", date: "28 Oct 2026", status: "Active", initials: "OM" },
-  { name: "Jackson Lee", email: "jackson@example.com", plan: "Standard", amount: "₹1,499", date: "27 Oct 2026", status: "Active", initials: "JL" },
-  { name: "Isabella Chen", email: "isabella@example.com", plan: "Basic", amount: "₹499", date: "26 Oct 2026", status: "Pending", initials: "IC" },
-  { name: "William Kim", email: "william@example.com", plan: "Premium", amount: "₹2,499", date: "25 Oct 2026", status: "Active", initials: "WK" },
-  { name: "Sophia Patel", email: "sophia@example.com", plan: "Standard", amount: "₹1,499", date: "24 Oct 2026", status: "Cancelled", initials: "SP" },
+  {
+    name: "Olivia Martin",
+    email: "olivia@example.com",
+    plan: "Premium",
+    amount: "₹2,499",
+    date: "28 Oct 2026",
+    status: "Active",
+    initials: "OM",
+  },
+  {
+    name: "Jackson Lee",
+    email: "jackson@example.com",
+    plan: "Standard",
+    amount: "₹1,499",
+    date: "27 Oct 2026",
+    status: "Active",
+    initials: "JL",
+  },
+  {
+    name: "Isabella Chen",
+    email: "isabella@example.com",
+    plan: "Basic",
+    amount: "₹499",
+    date: "26 Oct 2026",
+    status: "Pending",
+    initials: "IC",
+  },
+  {
+    name: "William Kim",
+    email: "william@example.com",
+    plan: "Premium",
+    amount: "₹2,499",
+    date: "25 Oct 2026",
+    status: "Active",
+    initials: "WK",
+  },
+  {
+    name: "Sophia Patel",
+    email: "sophia@example.com",
+    plan: "Standard",
+    amount: "₹1,499",
+    date: "24 Oct 2026",
+    status: "Cancelled",
+    initials: "SP",
+  },
 ];
 
+// SIDEBAR NAVIGATION
 const navigation = [
   { name: "Dashboard", icon: LayoutDashboard },
   { name: "Customers", icon: Users },
+  { name: "Products", icon: Package },
+  { name: "Plans", icon: Layers },
+  { name: "Quotations", icon: ClipboardList },
   { name: "Subscriptions", icon: CreditCard },
-  { name: "Plans", icon: Package },
-  { name: "Billing", icon: FileText },
+  { name: "Invoices", icon: Receipt },
+  { name: "Payments", icon: Wallet },
+  { name: "Discounts", icon: Percent },
   { name: "Reports", icon: ChartNoAxesCombined },
+  { name: "Staff & Roles", icon: ShieldCheck },
 ];
 
 function App() {
   const [activePage, setActivePage] = useState("Dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+if (!isAuthenticated) {
+  return (
+    <Auth onPreview={() => setIsAuthenticated(true)} />
+  );
+}
+  // DASHBOARD STATISTICS
   const stats = [
     {
       title: "Total Revenue",
@@ -104,39 +166,60 @@ function App() {
 
   return (
     <div className="app-container">
+
+      {/* MOBILE OVERLAY */}
       {sidebarOpen && (
-        <div className="mobile-overlay" onClick={() => setSidebarOpen(false)} />
+        <div
+          className="mobile-overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
 
+      {/* SIDEBAR */}
       <aside className={`sidebar ${sidebarOpen ? "sidebar-open" : ""}`}>
+
         <div className="brand">
           <div className="brand-icon">
             <CreditCard size={23} />
           </div>
-          <span>Subscript<span className="brand-highlight">ly</span></span>
-          <button className="mobile-close" onClick={() => setSidebarOpen(false)}>
+
+          <span>
+            Subscript<span className="brand-highlight">ly</span>
+          </span>
+
+          <button
+            className="mobile-close"
+            onClick={() => setSidebarOpen(false)}
+          >
             <X size={20} />
           </button>
         </div>
 
+        {/* WORKSPACE */}
         <div className="workspace">
           <div className="workspace-avatar">S</div>
+
           <div>
             <strong>Startup Workspace</strong>
             <small>Admin Account</small>
           </div>
+
           <MoreHorizontal size={19} />
         </div>
 
         <p className="nav-heading">MENU</p>
 
+        {/* NAVIGATION */}
         <nav className="navigation">
           {navigation.map((item) => {
             const Icon = item.icon;
+
             return (
               <button
                 key={item.name}
-                className={`nav-item ${activePage === item.name ? "active" : ""}`}
+                className={`nav-item ${
+                  activePage === item.name ? "active" : ""
+                }`}
                 onClick={() => {
                   setActivePage(item.name);
                   setSidebarOpen(false);
@@ -149,11 +232,19 @@ function App() {
           })}
         </nav>
 
+        {/* SIDEBAR BOTTOM */}
         <div className="sidebar-bottom">
+
           <p className="nav-heading">PREFERENCES</p>
+
           <button
-            className={`nav-item ${activePage === "Settings" ? "active" : ""}`}
-            onClick={() => setActivePage("Settings")}
+            className={`nav-item ${
+              activePage === "Settings" ? "active" : ""
+            }`}
+            onClick={() => {
+              setActivePage("Settings");
+              setSidebarOpen(false);
+            }}
           >
             <Settings size={19} />
             <span>Settings</span>
@@ -161,156 +252,299 @@ function App() {
 
           <div className="profile">
             <div className="profile-avatar">EA</div>
+
             <div className="profile-info">
               <strong>Admin User</strong>
               <small>admin@example.com</small>
             </div>
+
             <MoreHorizontal size={19} />
           </div>
         </div>
       </aside>
 
+      {/* MAIN CONTENT */}
       <main className="main-content">
+
+        {/* TOPBAR */}
         <header className="topbar">
+
           <div className="topbar-left">
-            <button className="mobile-menu" onClick={() => setSidebarOpen(true)}>
+
+            <button
+              className="mobile-menu"
+              onClick={() => setSidebarOpen(true)}
+            >
               <Menu size={22} />
             </button>
+
             <div>
               <h2>{activePage}</h2>
               <p>Welcome back! Here's what's happening today.</p>
             </div>
+
           </div>
 
           <div className="topbar-actions">
+
             <div className="search-box">
               <Search size={18} />
               <input placeholder="Search anything..." />
               <span>⌘ K</span>
             </div>
+
             <button className="notification-button">
               <Bell size={20} />
               <i />
             </button>
+
             <div className="top-profile">EA</div>
+
           </div>
         </header>
 
+        {/* DASHBOARD PAGE */}
         {activePage === "Dashboard" ? (
+
           <>
+
             <section className="welcome-row">
               <div>
                 <h1>Dashboard Overview</h1>
-                <p>Monitor your business performance and subscriptions.</p>
+                <p>
+                  Monitor your business performance and subscriptions.
+                </p>
               </div>
+
               <button className="date-button">
                 <CalendarDays size={17} />
                 Last 12 months
               </button>
             </section>
 
+            {/* STATISTICS */}
             <section className="stats-grid">
+
               {stats.map((stat) => {
                 const Icon = stat.icon;
+
                 return (
                   <div className="stat-card" key={stat.title}>
+
                     <div className="stat-top">
                       <div className={`stat-icon ${stat.color}`}>
                         <Icon size={21} />
                       </div>
+
                       <button className="more-button">
                         <MoreHorizontal size={20} />
                       </button>
                     </div>
+
                     <p className="stat-title">{stat.title}</p>
+
                     <h2>{stat.value}</h2>
+
                     <div className="stat-footer">
-                      <span className={stat.positive ? "positive" : "negative"}>
-                        {stat.positive ? <ArrowUpRight size={15} /> : <ArrowDownRight size={15} />}
+
+                      <span
+                        className={
+                          stat.positive ? "positive" : "negative"
+                        }
+                      >
+                        {stat.positive ? (
+                          <ArrowUpRight size={15} />
+                        ) : (
+                          <ArrowDownRight size={15} />
+                        )}
+
                         {stat.change}
                       </span>
+
                       <small>from last month</small>
+
                     </div>
                   </div>
                 );
               })}
+
             </section>
 
+            {/* CHARTS */}
             <section className="dashboard-grid">
+
+              {/* REVENUE CHART */}
               <div className="panel revenue-panel">
+
                 <div className="panel-header">
+
                   <div>
                     <h3>Revenue Overview</h3>
-                    <p>Your revenue performance throughout the year</p>
+                    <p>
+                      Your revenue performance throughout the year
+                    </p>
                   </div>
+
                   <button className="filter-button">2026</button>
+
                 </div>
 
                 <div className="revenue-total">
                   <h2>₹4,52,890</h2>
+
                   <span className="positive">
-                    <ArrowUpRight size={16} /> 12.8%
+                    <ArrowUpRight size={16} />
+                    12.8%
                   </span>
                 </div>
 
                 <div className="chart-container">
+
                   <ResponsiveContainer width="100%" height="100%">
+
                     <AreaChart data={revenueData}>
+
                       <defs>
-                        <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#7357e8" stopOpacity={0.24} />
-                          <stop offset="100%" stopColor="#7357e8" stopOpacity={0.01} />
+                        <linearGradient
+                          id="revenueGradient"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="0%"
+                            stopColor="#7357e8"
+                            stopOpacity={0.24}
+                          />
+
+                          <stop
+                            offset="100%"
+                            stopColor="#7357e8"
+                            stopOpacity={0.01}
+                          />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#edf0f5" />
-                      <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#9299a8", fontSize: 12 }} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fill: "#9299a8", fontSize: 12 }} tickFormatter={(value) => `₹${value / 1000}k`} />
-                      <Tooltip formatter={(value) => [`₹${Number(value).toLocaleString("en-IN")}`, "Revenue"]} />
-                      <Area type="monotone" dataKey="revenue" stroke="#7357e8" strokeWidth={3} fill="url(#revenueGradient)" />
+
+                      <CartesianGrid
+                        strokeDasharray="4 4"
+                        vertical={false}
+                        stroke="#edf0f5"
+                      />
+
+                      <XAxis
+                        dataKey="month"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: "#9299a8", fontSize: 12 }}
+                      />
+
+                      <YAxis
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: "#9299a8", fontSize: 12 }}
+                        tickFormatter={(value) => `₹${value / 1000}k`}
+                      />
+
+                      <Tooltip
+                        formatter={(value) => [
+                          `₹${Number(value).toLocaleString("en-IN")}`,
+                          "Revenue",
+                        ]}
+                      />
+
+                      <Area
+                        type="monotone"
+                        dataKey="revenue"
+                        stroke="#7357e8"
+                        strokeWidth={3}
+                        fill="url(#revenueGradient)"
+                      />
+
                     </AreaChart>
+
                   </ResponsiveContainer>
+
                 </div>
               </div>
 
+              {/* SUBSCRIPTION OVERVIEW */}
               <div className="panel subscription-panel">
+
                 <div className="panel-header">
+
                   <div>
                     <h3>Subscription Overview</h3>
                     <p>Current subscription status</p>
                   </div>
+
                   <MoreHorizontal size={21} />
+
                 </div>
 
                 <div className="donut-container">
+
                   <div className="donut">
+
                     <div className="donut-inner">
                       <h2>1,248</h2>
                       <span>Total</span>
                     </div>
+
                   </div>
+
                 </div>
 
                 <div className="legend">
-                  <div><span className="dot active-dot" /> Active <strong>856</strong></div>
-                  <div><span className="dot pending-dot" /> Pending <strong>245</strong></div>
-                  <div><span className="dot cancelled-dot" /> Cancelled <strong>147</strong></div>
+
+                  <div>
+                    <span className="dot active-dot" />
+                    Active
+                    <strong>856</strong>
+                  </div>
+
+                  <div>
+                    <span className="dot pending-dot" />
+                    Pending
+                    <strong>245</strong>
+                  </div>
+
+                  <div>
+                    <span className="dot cancelled-dot" />
+                    Cancelled
+                    <strong>147</strong>
+                  </div>
+
                 </div>
+
               </div>
+
             </section>
 
+            {/* RECENT SUBSCRIPTIONS */}
             <section className="panel table-panel">
+
               <div className="panel-header table-heading">
+
                 <div>
                   <h3>Recent Subscriptions</h3>
                   <p>Latest customer subscription activity</p>
                 </div>
-                <button className="view-all-button" onClick={() => setActivePage("Subscriptions")}>
-                  View all <ArrowUpRight size={16} />
+
+                <button
+                  className="view-all-button"
+                  onClick={() => setActivePage("Subscriptions")}
+                >
+                  View all
+                  <ArrowUpRight size={16} />
                 </button>
+
               </div>
 
               <div className="table-scroll">
+
                 <table>
+
                   <thead>
                     <tr>
                       <th>CUSTOMER</th>
@@ -321,44 +555,90 @@ function App() {
                       <th></th>
                     </tr>
                   </thead>
+
                   <tbody>
+
                     {subscriptions.map((sub) => (
+
                       <tr key={sub.email}>
+
                         <td>
                           <div className="customer-cell">
-                            <div className="customer-avatar">{sub.initials}</div>
+
+                            <div className="customer-avatar">
+                              {sub.initials}
+                            </div>
+
                             <div>
                               <strong>{sub.name}</strong>
                               <small>{sub.email}</small>
                             </div>
+
                           </div>
                         </td>
+
                         <td>{sub.plan}</td>
-                        <td className="amount-cell">{sub.amount}</td>
+
+                        <td className="amount-cell">
+                          {sub.amount}
+                        </td>
+
                         <td>{sub.date}</td>
+
                         <td>
-                          <span className={`status ${sub.status.toLowerCase()}`}>
+                          <span
+                            className={`status ${sub.status.toLowerCase()}`}
+                          >
                             {sub.status}
                           </span>
                         </td>
-                        <td><button className="more-button"><MoreHorizontal size={19} /></button></td>
+
+                        <td>
+                          <button className="more-button">
+                            <MoreHorizontal size={19} />
+                          </button>
+                        </td>
+
                       </tr>
+
                     ))}
+
                   </tbody>
+
                 </table>
+
               </div>
+
             </section>
+
           </>
+
         ) : (
+
+          /* OTHER MODULE PAGES */
           <section className="placeholder-page">
-            <div className="placeholder-icon"><Plus size={28} /></div>
+
+            <div className="placeholder-icon">
+              <Plus size={28} />
+            </div>
+
             <h2>{activePage} Management</h2>
-            <p>The {activePage.toLowerCase()} section is ready for development.</p>
-            <button className="primary-button" onClick={() => setActivePage("Dashboard")}>
+
+            <p>
+              The {activePage.toLowerCase()} section is ready for development.
+            </p>
+
+            <button
+              className="primary-button"
+              onClick={() => setActivePage("Dashboard")}
+            >
               Back to Dashboard
             </button>
+
           </section>
+
         )}
+
       </main>
     </div>
   );
