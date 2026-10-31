@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 * {
@@ -95,7 +94,7 @@ button {
   margin-top: 4px;
 }
 
-.workspace > svg {
+.workspace>svg {
   margin-left: auto;
   color: #9299a8;
 }
@@ -175,7 +174,7 @@ button {
   flex: 1;
 }
 
-.profile > svg {
+.profile>svg {
   color: #9299a8;
 }
 
@@ -446,11 +445,9 @@ button {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: conic-gradient(
-    #7357e8 0% 68.6%,
-    #ffb45f 68.6% 88.2%,
-    #e9eaf0 88.2% 100%
-  );
+  background: conic-gradient(#7357e8 0% 68.6%,
+      #ffb45f 68.6% 88.2%,
+      #e9eaf0 88.2% 100%);
   position: relative;
 }
 
@@ -482,7 +479,7 @@ button {
   padding: 0 8px;
 }
 
-.legend > div {
+.legend>div {
   display: flex;
   align-items: center;
   font-size: 11px;
