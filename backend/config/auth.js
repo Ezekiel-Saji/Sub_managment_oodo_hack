@@ -1,8 +1,5 @@
-
+import "../load-env.js";
 import { createClient } from "@supabase/supabase-js";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 export const authClient = createClient(
   process.env.SUPABASE_URL,

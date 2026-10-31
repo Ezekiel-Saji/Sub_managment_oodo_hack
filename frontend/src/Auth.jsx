@@ -12,11 +12,14 @@ import {
 } from "lucide-react";
 import "./Auth.css";
 
+const API_URL = "http://localhost:5000";
+
 function Auth({ onPreview }) {
   const [isSignup, setIsSignup] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -30,17 +33,69 @@ function Auth({ onPreview }) {
     setMessage("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
 
     if (isSignup && form.password !== form.confirmPassword) {
       setMessage("Passwords do not match.");
       return;
     }
 
-    setMessage(
-      "The authentication API is not connected yet. Please try again after integration."
-    );
+    setIsLoading(true);
+
+    try {
+      const endpoint = isSignup ? "/api/auth/signup" : "/api/auth/login";
+
+      const body = isSignup
+        ? {
+            name: form.name.trim(),
+            email: form.email.trim(),
+            password: form.password,
+          }
+        : {
+            email: form.email.trim(),
+            password: form.password,
+          };
+
+      const response = await fetch(`${API_URL}${endpoint}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Authentication failed.");
+      }
+
+      if (data.session?.access_token) {
+        sessionStorage.setItem("access_token", data.session.access_token);
+        sessionStorage.setItem("user", JSON.stringify(data.user));
+
+        setMessage(data.message || "Success!");
+
+        if (onPreview) {
+          onPreview(data.user);
+        }
+      } else {
+        setMessage(
+          data.message ||
+            "Account created. Please verify your email before signing in."
+        );
+      }
+    } catch (error) {
+      setMessage(
+        error.message === "Failed to fetch"
+          ? "Cannot connect to the server. Please check whether the backend is running."
+          : error.message
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -50,9 +105,7 @@ function Auth({ onPreview }) {
           <div className="auth-logo">
             <CreditCard size={25} />
           </div>
-          <span>
-            Subscript<span>ly</span>
-          </span>
+          <span>Subscript<span>ly</span></span>
         </div>
 
         <div className="auth-content">
@@ -104,15 +157,11 @@ function Auth({ onPreview }) {
             <div className="auth-logo">
               <CreditCard size={23} />
             </div>
-            <span>
-              Subscript<span>ly</span>
-            </span>
+            <span>Subscript<span>ly</span></span>
           </div>
 
           <div className="auth-heading">
-            <h2>
-              {isSignup ? "Create your account" : "Welcome back!"}
-            </h2>
+            <h2>{isSignup ? "Create your account" : "Welcome back!"}</h2>
             <p>
               {isSignup
                 ? "Get started with your Subscriptly account."
@@ -219,15 +268,19 @@ function Auth({ onPreview }) {
               </div>
             )}
 
-            {message && (
-              <div className="auth-message">
-                {message}
-              </div>
-            )}
+            {message && <div className="auth-message">{message}</div>}
 
-            <button type="submit" className="auth-submit">
-              {isSignup ? "Create Account" : "Sign In"}
-              <ArrowRight size={18} />
+            <button
+              type="submit"
+              className="auth-submit"
+              disabled={isLoading}
+            >
+              {isLoading
+                ? "Please wait..."
+                : isSignup
+                  ? "Create Account"
+                  : "Sign In"}
+              {!isLoading && <ArrowRight size={18} />}
             </button>
           </form>
 
@@ -237,6 +290,7 @@ function Auth({ onPreview }) {
               : "Don't have an account?"}
 
             <button
+              type="button"
               onClick={() => {
                 setIsSignup(!isSignup);
                 setMessage("");
